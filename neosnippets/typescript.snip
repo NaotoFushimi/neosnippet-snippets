@@ -1,0 +1,114 @@
+snippet sni.class
+	class ${1} {
+		constructor(){
+
+		}
+	}
+
+snippet sni.xhr 
+	var xhr = new XMLHttpRequest();
+	var url = "";
+	var param = "?" + "";
+	xhr.open("GET" , url + param , true)
+	var json = JSON.stringify({});
+	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	xhr.addEventListener("readystatechange" , ()=>{
+		if (xhr.readyState === 4 && xhr.status === 200){
+			var returnJson : any = JSON.parse(this.xhr.responseText);
+		}
+	});
+	xhr.send(json);
+
+snippet sni.unixtime
+	private getUnixTime() : number{
+		var d : any = new Date;
+		var unix : any = d / 1000;
+		return Math.round(unix);
+	}
+
+snippet sni.getbrowser
+	public getBrowser() : string {
+		var userAgent = window.navigator.userAgent.toLowerCase();
+		if (userAgent.indexOf('opera') != -1) {
+		 return 'opera';
+		} else if (userAgent.indexOf('msie') != -1) {
+		 return 'ie';
+		} else if (userAgent.indexOf('chrome') != -1) {
+		 return 'chrome';
+		} else if (userAgent.indexOf('safari') != -1) {
+		 return 'safari';
+		} else if (userAgent.indexOf('gecko') != -1) {
+		 return 'gecko';
+		} else {
+		 return 'other';
+		}
+	}
+
+snippet sni.singleton
+	class ${1} {
+		private static _instance : $1;
+		constructor(){
+
+		}
+		
+		public static getInstance() : $1{
+			if ($1._instance == null){
+	$1._instance = new $1();
+			}
+
+			return $1._instance;
+		}
+	}
+
+snippet sni.deepcopy
+	JSON.parse(JSON.stringify({}))
+
+snippet react.component
+	class ${1} extends React.Component<any, any>{
+		constructor(props) {
+			super(props);
+		}
+	
+		componentDidMount() : void {
+			//"マウント後"
+		}
+	
+		componentWillUnmount() : void {
+			//viewのデストラクタ
+		}
+		render() {
+			return (
+	<div >
+	 //<button onClick={this.createView.bind(this)}>新規グループ</button>
+	</div>
+			);
+		}
+	}
+
+snippet keys
+	for (var _id in hash){
+		//var row = hash[_id];
+	}
+
+snippet react.action
+	class ${1}Action{
+		//public static showNewView() : void {
+		//	var instance = GroupStoreModule.GroupStore.getInstance();
+		//	instance.dispatch("onShowNewView");
+		//}
+	}
+snippet sni.random
+	var getUnqueString = ()=> {
+		var length = 8;
+		var d : any = new Date;
+		return  Math.random().toString(36).slice(-length) + "_" + d ;
+	};
+
+
+snippet for
+	for (var i = 0; i <${1}.length; $i++ ){
+		var ${2} = $1[i];
+	}
+
+
+

@@ -1,0 +1,55 @@
+snippet perl
+    use 5.20.2;
+    use strict;
+    use warnings;
+    
+snippet search_by_sql
+    my $where_statement = join " AND " , map{"$_ = ?"} sort keys %$where;
+    my $update_fields = +{ map { "$_"."_count" => $decoded->{log_type} eq $_  ?  $count : 0  }qw /policy_page wappen_impression wappen_cancel wappen_click/ };
+    my $delta_statement = join "," , map{"$_ = $_ + ?"} sort keys %$update_fields;
+    my $dao = $self->dao('default');
+    my $sql = "UPDATE daily_media_survey_summary 
+        SET $delta_statement
+        WHERE $where_statement;
+    ";
+    my @bind = ((map{ $update_fields->{$_}  }sort keys %$update_fields) , (map{ $where->{$_} } sort keys %$where));
+    $dao->do($sql, undef , @bind);
+
+snippet usedd
+    use Data::Dumper;
+snippet warnd
+    warn Dumper ${1}
+
+snippet keys
+
+
+snippet dbi
+    use DBI;
+    use DBIx::QueryLog ();
+    my $dbh = DBI->connect('DBI:mysql:hoge_db', 'root', 'pass');
+    my $sth;
+    $sth = $dbh->prepare("SELECT * FROM hoge_table LIMIT ?");
+    $sth->execute(1);
+
+snippet file_read
+    open(DATAFILE, "< ${1:file_path}")) or die("error :$!");
+    while (my $line = <DATAFILE>){
+          chomp($line);
+          print "$line\n";
+    }
+
+snippet ltsv
+    sub create_ltsv{
+        my $hash = ref $_[0] ? $_[0] :  { @_ };
+        join "\t" ,map{
+            $_. ':' .$hash->{$_};
+        }keys $hash;
+    }
+
+snippet error
+    say STDERR create_ltsv(
+        error => $@->message ,
+        log_name => $_ , 
+        time => time ,
+        datetime => localtime(time)->strftime('%Y-%m-%d %H:%M:%S'),
+    );
