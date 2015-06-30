@@ -1,55 +1,154 @@
 snippet perl
-    use 5.20.2;
-    use strict;
-    use warnings;
-    
-snippet search_by_sql
-    my $where_statement = join " AND " , map{"$_ = ?"} sort keys %$where;
-    my $update_fields = +{ map { "$_"."_count" => $decoded->{log_type} eq $_  ?  $count : 0  }qw /policy_page wappen_impression wappen_cancel wappen_click/ };
-    my $delta_statement = join "," , map{"$_ = $_ + ?"} sort keys %$update_fields;
-    my $dao = $self->dao('default');
-    my $sql = "UPDATE daily_media_survey_summary 
-        SET $delta_statement
-        WHERE $where_statement;
-    ";
-    my @bind = ((map{ $update_fields->{$_}  }sort keys %$update_fields) , (map{ $where->{$_} } sort keys %$where));
-    $dao->do($sql, undef , @bind);
+	use 5.20.2;
+	use strict;
+	use warnings;
+	
+snippet tech.search_by_sql
+	#my $where_statement = join " AND " , map{"$_ = ?"} sort keys %$where;
+	#my $update_fields = +{ map { "$_"."_count" => $decoded->{log_type} eq $_  ?  $count : 0  }qw /policy_page wappen_impression wappen_cancel wappen_click/ };
+	#my $delta_statement = join "," , map{"$_ = $_ + ?"} sort keys %$update_fields;
+	#my $dao = $self->dao('default');
+	#my $sql = "UPDATE daily_media_survey_summary 
+	#	SET $delta_statement
+	#	WHERE $where_statement;
+	#";
+	#my @bind = ((map{ $update_fields->{$_}  }sort keys %$update_fields) , (map{ $where->{$_} } sort keys %$where));
+	#$dao->do($sql, undef , @bind);
 
 snippet usedd
-    use Data::Dumper;
+	use Data::Dumper;
 snippet warnd
-    warn Dumper ${1}
+	warn Dumper ${1}
 
 snippet keys
-
+	for my $hash_key ( keys %$hash){
+		my $hash_value = $hash->{$hash_key};
+	}
 
 snippet dbi
-    use DBI;
-    use DBIx::QueryLog ();
-    my $dbh = DBI->connect('DBI:mysql:hoge_db', 'root', 'pass');
-    my $sth;
-    $sth = $dbh->prepare("SELECT * FROM hoge_table LIMIT ?");
-    $sth->execute(1);
+	use DBI;
+	use DBIx::QueryLog ();
+	my $dbh = DBI->connect('DBI:mysql:hoge_db', 'root', 'pass');
+	my $sth;
+	$sth = $dbh->prepare("SELECT * FROM hoge_table LIMIT ?");
+	$sth->execute(1);
+			# inserted_id my $rv = $dbh->last_insert_id("anki", "anki", "tag", "id");
+	my $array_ref = [];
+	while (my $row = $sth->fetchrow_hashref()){
+		push @$array_ref , $row;
+	}
+	$dbh->disconnect;
 
 snippet file_read
-    open(DATAFILE, "< ${1:file_path}")) or die("error :$!");
-    while (my $line = <DATAFILE>){
-          chomp($line);
-          print "$line\n";
-    }
+	open(DATAFILE, "< ${1:file_path}")) or die("error :$!");
+	while (my $line = <DATAFILE>){
+	chomp($line);
+	print "$line\n";
+	}
 
-snippet ltsv
-    sub create_ltsv{
-        my $hash = ref $_[0] ? $_[0] :  { @_ };
-        join "\t" ,map{
-            $_. ':' .$hash->{$_};
-        }keys $hash;
-    }
+snippet tech.ltsv
+	sub create_ltsv{
+		my $hash = ref $_[0] ? $_[0] :  { @_ };
+		join "\t" ,map{
+			$_. ':' .$hash->{$_};
+		}keys $hash;
+	}
 
-snippet error
-    say STDERR create_ltsv(
-        error => $@->message ,
-        log_name => $_ , 
-        time => time ,
-        datetime => localtime(time)->strftime('%Y-%m-%d %H:%M:%S'),
-    );
+snippet tech.error
+	say STDERR create_ltsv(
+		error => $@->message ,
+		log_name => $_ , 
+		time => time ,
+		datetime => localtime(time)->strftime('%Y-%m-%d %H:%M:%S'),
+	);
+
+snippet tech.join_stram
+	#my $text = join "::", map {$_} (1,2,3,4,5,6);  #$text = 1::2::3::4::5::6
+	#my ($promotion_video_id , $media_id , $serial_id , $device_id , $browser_id , $date) = split "::" , $text;
+
+snippet tech.search_dao
+	#my $vender = $dao->search('application_vender' , {vender_login_id => $vender_login_id} , {})->all;
+	#$p->{vender_id} = [map{$_->id}@$vender];
+
+snippet sub
+	sub ${1} {
+		my ($input) = @_;
+		${2}
+	}
+
+snippet config
+	use File::Spec;
+	my $config = do(File::Spec->catdir(dirname(__FILE__)) . '/../../../config/' . $ENV{PLACK_ENV} . '.pl') or die "config file for $ENV{PLACK_ENV}";
+
+snippet tech.parameter_to_hash
+	my $args = "&id=765&age=60&name=naoto";
+	my $args_hash = +{map{split("=" , $_ , 2)}split("&" , $args)};
+	##$VAR1 = {
+	##	  'age' => '60',
+	##	  'id' => '765',
+	##	  'name' => 'naoto'
+	##};
+
+snippet chmod
+	use use File::Path::Tiny qw/mk/;
+	File::Path::Tiny::mk ($path, 0755);
+snippet extend
+	#use parent qw(Kuroneco::Model);
+
+snippet time
+	#use Time::Piece;
+	my $datetime = localtime()->strftime('%Y-%m-%d %H:%M:%S');
+
+snippet json
+	#use JSON::XS qw/decode_json encode_json/;
+	decode_json encode("utf8" , {});
+
+snippet tech.map1
+	my $category = [
+		{id => 3, col=>"naoto"},
+		{id => 4, col=>"naoto2"},
+		{id => 5, col=>"naoto3"},
+	];
+	
+	my $category_hash= {map{$_->{id} => $_->{col}}@$category};
+	#$VAR1 = {
+	#   '5' => 'naoto3',
+	#   '4' => 'naoto2',
+	#   '3' => 'naoto'
+	#};
+snippet tech.deep_copy
+	my $hashArray = [
+		{"aaa"=>1},
+		{"aaa"=>2},
+		{"aaa"=>3},
+		{"aaa"=>4}
+	];
+	my $hashArrayCopy = [map {%$_} @$hashArray];
+
+snippet tech.map2
+	my @addresses = ('katsuo@example.com', 'wakame@example.com', 'tara@example.com');
+	my @no_spam = map { my $email = $_; $email =~ s/\@/ at /; $email } @addresses;
+	# @no_spam には ('katsuo at example.com', 'wakame at example.com', 'tara at example.com) が入る。
+
+snippet tech.json_responce
+	return $c->json_response([map{$_->get_columns}@$result]);
+
+
+snippet tech.renban
+	my $renban = [map{join("", $_ , $_+1 , $_+2)}0..4];
+	#$VAR1 = [
+	#	  '012',
+	#	  '123',
+	#	  '234',
+	#	  '345',
+	#	  '456',
+	#];
+
+snippet tech.grep
+	my @cities = ('Sapporo', 'Nishitokyo', 'Yokohama');
+	my @prefs  = ('Hokkaido', 'Tokyo', 'Yokohama');
+	my %seen;
+	my @uniq = grep { ++$seen{$_} < 2 } (@cities, @prefs);
+	## @uniq には ('Sapporo', 'Nishitokyo', 'Yokohama', 'Hokkaido', 'Tokyo') が入る
+
+
