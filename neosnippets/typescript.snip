@@ -1,11 +1,11 @@
-snippet sni.class
+snippet class
 	class ${1} {
 		constructor(){
 
 		}
 	}
 
-snippet sni.xhr 
+snippet xhr 
 	var xhr = new XMLHttpRequest();
 	var url = "";
 	var param = "?" + "";
@@ -109,6 +109,65 @@ snippet for
 	for (var i = 0; i <${1}.length; $i++ ){
 		var ${2} = $1[i];
 	}
+
+snippet join
+	//["A", 9,16].join(''); //A916
+
+snippet bind
+	//setTimeout(bob.sayHello.bind(bob), 3000);  sayHelloメソッド内のthisは全部bobに
+
+snippet call
+	//methodA.call(thisにしたいobject , [, arg1 [, arg2, ...]]);
+
+
+snippet component
+	class View extends React.Component<any, any>{
+		store : Store;
+		constructor(props) {
+			super(props);
+			this.store = this.props.store;
+		}
+	
+		onClick(){
+			this.store.count++;
+			this.forceUpdate();
+		}
+	
+		render() {
+			return (
+				<div key={this.store.key}>
+					OF{this.store.count}
+					<button onClick={this.onClick.bind(this)}></button>
+				</div>
+			);
+		}
+	}
+
+snippet viewModel
+	export class Store {
+		count : number = 0;
+		key = String(Math.random());
+	
+		getView(){
+			return <View store={this}/>
+		}
+	}
+
+snippet sni.cssGlobal 
+    
+    var style = document.createElement("style");
+    document.head.appendChild(style);
+
+    var appendStyle = function(selector, prop, val) {
+      style.sheet.addRule(selector, prop +": "+ val);
+    };
+
+    appendStyle("*::-webkit-media-controls-play-button", "width", '200px');
+
+
+
+
+
 
 
 

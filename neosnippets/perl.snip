@@ -152,3 +152,22 @@ snippet tech.grep
 	## @uniq には ('Sapporo', 'Nishitokyo', 'Yokohama', 'Hokkaido', 'Tokyo') が入る
 
 
+
+
+snippet wanon2.dispatcher
+	package ${1:AppName}::Web::Dispatcher::${2:FileName};
+	use strict;
+	use warnings;
+	use utf8;
+	use Wanon2::Web::Dispatcher::Proxy -from => '$1::Web::Dispatcher';
+	
+	hook '/' => sub {
+		my ($c, $args , $p) = @_;
+	};
+	1;
+
+
+snippet wanon2.dispatcher.proxy
+   #proxy '/admin' => 'test_lesson::Web::Dispatcher::Admin';
+
+
