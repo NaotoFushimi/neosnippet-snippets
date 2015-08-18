@@ -15,9 +15,9 @@ snippet tech.search_by_sql
 	#my @bind = ((map{ $update_fields->{$_}  }sort keys %$update_fields) , (map{ $where->{$_} } sort keys %$where));
 	#$dao->do($sql, undef , @bind);
 
-snippet usedd
+snippet use.Data::Dumper;
 	use Data::Dumper;
-snippet warnd
+snippet warn.Dumper
 	warn Dumper ${1}
 
 snippet keys
@@ -151,9 +151,6 @@ snippet tech.grep
 	my @uniq = grep { ++$seen{$_} < 2 } (@cities, @prefs);
 	## @uniq には ('Sapporo', 'Nishitokyo', 'Yokohama', 'Hokkaido', 'Tokyo') が入る
 
-
-
-
 snippet wanon2.dispatcher
 	package ${1:AppName}::Web::Dispatcher::${2:FileName};
 	use strict;
@@ -166,8 +163,170 @@ snippet wanon2.dispatcher
 	};
 	1;
 
-
 snippet wanon2.dispatcher.proxy
    #proxy '/admin' => 'test_lesson::Web::Dispatcher::Admin';
+
+snippet teng.single
+	my $dao = $c->dao('default');
+	my col = $dao->single('${1:table_name}' , {id => {$2:id}} , {${3:where}}});
+	my $filename = $col->${4:data};
+
+snippet teng.all
+	my $dao = $c->dao('default');
+	my $${1:table_name}_all = $dao->search('$1')->all;
+	my $$1_all_id_hash => {map{$_->id => $_->get_columns_for_json}@$$1_all});
+
+snippet teng.group_by
+	my $opt = {};
+	$opt->{group_by} = "time_unit_unixtime";
+	$opt->{columns} = 
+		[
+			"time_unit_unixtime" , 
+			\'SUM(cost_limit_per_hour) as cost_limit_per_hour' , 
+			\'MAX(stopped_time) as stopped_time' , 
+			\"CASE WHEN is_stopped = 1 THEN '消化' ELSE '未消化' END AS is_stopped",
+		];
+	my $daily_cost_limit = $dao->search($daily_cost_limit_table_name , $where , $opt)->all; #arrayref
+
+snippet teng.search_by_sql
+	my $query = "
+		SELECT *
+		FROM 
+		WHERE 
+			year_month_date >= ? 
+			AND year_month_date <= ?  
+			AND time_unit_unixtime >= ? 
+			AND time_unit_unixtime <= ?  
+			AND promotion_id = ? 
+		GROUP BY time_unit_unixtime , media_id
+		";
+		
+	my $${1} = $dao->search_by_sql($query , [
+		$start_year_month_date , 
+		$end_year_month_date , 
+		$start_time ,
+		$end_time ,
+		$promotion_id ,
+	])->all;
+	
+	my $${2}_hash = {};
+	for(@$1){
+		$_ = $_->get_columns;
+		my ($media_id , $time_unit_unixtime , $sum) = @$_{qw/media_id time_unit_unixtime sum/};
+		$${2}_hash->{$datetime} ||= {};
+	}
+
+
+snippet wanon2.proxy
+	package ${1}::Web::Dispatcher;
+	use strict;
+	use warnings;
+	use Wanon2::Web::Dispatcher;
+	proxy '/wappen' => '$1::Web::Dispatcher::Wappen';
+
+snippet wanon2.dispatcher
+	package ${1:project_name}::Web::Dispatcher::${2:module_name}}{
+		use strict;
+		use utf8;
+		use warnings;
+		use Wanon2::Web::Dispatcher::Proxy -from => '$1::Web::Dispatcher';
+	
+		our $PATH_PREFIX = "/$2"; #ここまでのURLの"フルパス"を書く
+	
+		proxy '/${3:next_layer}'  => '$1::Web::Dispatcher::$2::$3';
+	
+		any '/' => sub {
+			#http://localhost:xxxx/$1/ でアクセス
+			warn "99999999999999999999999999999999";
+		};
+	
+	};
+	1;
+
+snippet wanon2.dispatcher.json_responce
+	get '/survey/{surveyId:\d+}/' => sub {
+		my ($c,$args,$p) = @_;
+
+		my $model = $c->model('Survey');
+		my $survey = $model->get_hash($args->{surveyId});
+
+		return $c->json_response($survey);
+	};
+	
+snippet wanon2.model_base
+
+	package ${1:project_name}::Model{
+		use parent qw/$1/;
+	
+		sub c { shift->{c}; }
+	
+		sub config {
+			my ($self, $class) = @_;
+			return $self->{c}->config($class);
+		}
+	}
+	1;
+
+
+snippet wanon2.model
+	package ${1:project}::Model::${2:module_name} {
+		use 5.16.2;
+		use strict;
+		use warnings;
+		use $1::DAO::DB;
+		use Data::Dumper;
+		use Time::Piece;
+		use Encode qw/encode decode/;
+		use JSON::XS qw/encode_json decode_json/;
+		use parent qw($1::Model);
+	
+		sub ${2:function_name} {
+	
+			my ($self, $data) = @_;
+			my $dao = $self->dao('default');
+		}
+	}
+	1;
+
+snippet wanon2.config_base
+	#use DBIx::QueryLog;
+	use FindBin;
+	use HTTP::Session::Store::File;
+	use HTTP::Session::State::Cookie;
+	use Wanon2::Constant qw(-test);
+	
+	#DBIx::QueryLog->color('cyan');
+	#eval { DBIx::QueryLog->compact(1); };
+	#eval { DBIx::QueryLog->compress(1); } if $@;
+	
+	my $validator = do "$FindBin::Bin/../config/validator.pl" || {};
+	
+	my $module_name = '${1:project}';
+	my $db = lc($module_name);
+	
+	my $config = +{
+		root_dir		 => $FindBin::Bin . '/../',
+		nginx_log_dir	=> "/var/log/supervisor/nginx",
+	
+		DAO => {
+			default		=> (do('/var/keys/staging_mainecoon_master_db.pl'))->($db, $mainecoon_db_host),
+			slave_db	   => (do('/var/keys/staging_mainecoon_slave_db.pl'))->($db, $mainecoon_db_host),
+			qudo		   => (do('/var/keys/staging_mainecoon_qudo_db.pl'))->($db_qudo, $mainecoon_db_host),
+			kuroneco_write => (do('/var/keys/staging_kuroneco_write_db.pl'))->($db_kuroneco, $kuroneco_db_host),
+			kuroneco_read  => (do('/var/keys/staging_kuroneco_read_db.pl'))->($db_kuroneco, $kuroneco_db_host),
+		},  
+		'session' => {
+			state => HTTP::Session::State::Cookie->new(
+				name   => 'http_session_sid' , 
+				domain => 'velet.jp' , 
+			),
+			store => HTTP::Session::Store::File->new(dir => '/tmp'),
+		},
+		'validator' => $validator,
+		'test' => { mode => TEST_MODE_UNIT }
+	};
+	
+	$config;
+
 
 

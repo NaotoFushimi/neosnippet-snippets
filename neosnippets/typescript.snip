@@ -63,6 +63,13 @@ snippet sni.singleton
 snippet sni.deepcopy
 	JSON.parse(JSON.stringify({}))
 
+snippet module 
+	module ${1}{
+		export module ${2}{
+
+		}
+	}
+
 snippet react.component
 	class ${1} extends React.Component<any, any>{
 		constructor(props) {
@@ -78,12 +85,60 @@ snippet react.component
 		}
 		render() {
 			return (
-	<div >
-	 //<button onClick={this.createView.bind(this)}>新規グループ</button>
-	</div>
+				<div >
+				 //<button onClick={this.createView.bind(this)}>新規グループ</button>
+				</div>
 			);
 		}
 	}
+
+snippet react.store
+
+	module ${1} {
+		export module ${2} {
+			export class Store {
+				component : React.Component;
+				isFirstCall : boolean = false;
+				data : any;
+				constructor(){
+	
+				}
+	
+				private forceUpdate(){
+					if(this.component){
+						this.component.forceUpdate();
+					}
+				}
+	
+				public attachComponent(component){
+					if (!this.isFirstCall){
+						this.getInitialData();
+					}
+					this.component = component;
+				}
+
+				public removeComponent(){
+					this.component = null;
+				}
+
+				public updateData(data){
+					this.data = data;
+					this.forceUpdate();
+				}
+
+				private getInitialData(){
+					this.isFirstCall = true;
+					this.data = null;
+					this.forceUpdate();
+				}
+
+			}
+		}
+	
+	}
+
+snippet ref
+	/// <reference path="Component/Parent.react.ts" />
 
 snippet keys
 	for (var _id in hash){
@@ -120,49 +175,17 @@ snippet call
 	//methodA.call(thisにしたいobject , [, arg1 [, arg2, ...]]);
 
 
-snippet component
-	class View extends React.Component<any, any>{
-		store : Store;
-		constructor(props) {
-			super(props);
-			this.store = this.props.store;
-		}
-	
-		onClick(){
-			this.store.count++;
-			this.forceUpdate();
-		}
-	
-		render() {
-			return (
-				<div key={this.store.key}>
-					OF{this.store.count}
-					<button onClick={this.onClick.bind(this)}></button>
-				</div>
-			);
-		}
-	}
-
-snippet viewModel
-	export class Store {
-		count : number = 0;
-		key = String(Math.random());
-	
-		getView(){
-			return <View store={this}/>
-		}
-	}
 
 snippet sni.cssGlobal 
-    
-    var style = document.createElement("style");
-    document.head.appendChild(style);
+	
+	var style = document.createElement("style");
+	document.head.appendChild(style);
 
-    var appendStyle = function(selector, prop, val) {
-      style.sheet.addRule(selector, prop +": "+ val);
-    };
+	var appendStyle = function(selector, prop, val) {
+	  style.sheet.addRule(selector, prop +": "+ val);
+	};
 
-    appendStyle("*::-webkit-media-controls-play-button", "width", '200px');
+	appendStyle("*::-webkit-media-controls-play-button", "width", '200px');
 
 
 
