@@ -15,9 +15,8 @@ snippet tech.search_by_sql
 	#my @bind = ((map{ $update_fields->{$_}  }sort keys %$update_fields) , (map{ $where->{$_} } sort keys %$where));
 	#$dao->do($sql, undef , @bind);
 
-snippet use.Data::Dumper;
+snippet usedd
 	use Data::Dumper;
-snippet warn.Dumper
 	warn Dumper ${1}
 
 snippet keys
@@ -287,6 +286,53 @@ snippet wanon2.model
 		}
 	}
 	1;
+
+snippet wanon2.dispatcher.set
+
+	#use JSON::XS qw/encode_json decode_json/;
+	any '/set/' => sub{
+	    my ($c,$args,$p) = @_;
+		
+		my $json = decode_json $p->{data};
+		my $data ;
+
+		$c->json_response($data);
+	};
+	
+snippet wanon2.model.set
+	sub set_${1:table_name} {
+		my ($c , $data) = @_;
+		my $dao = $c->dao("default");
+		my $inseted_data = $dao->single("$1" , $data);
+		return $inseted_data;
+	}
+
+snippet wanon2.model.update
+	sub update_${1:table_name} {
+		my ($c , $data_hash) = @_;
+		my $dao = $c->dao("default");
+		my $id = $data_hash->{id};
+		delete($data_hash->{id});
+		my $updated_data = $dao->update("$1" , $data_hash , {id => $id});
+		return $updated_data;
+	}
+
+snippet wanon2.model.delete
+	sub delete_${1:table_name} {
+		my ($c , $data_hash) = @_;
+		my $dao = $c->dao("default");
+		my $id = $data_hash->{id};
+		delete($data_hash->{id});
+		my $deleted_data = $dao->delete("$1" , $data_hash , {id => $id});
+		return $deleted_data;
+	}
+
+snippet wanon2.model.intermediate.set
+	sub _set {
+		my ($c , ${1:parent_table_id} , ${2:child_table_id}) = @_;
+		my $dao = $c->dao("default");
+		my $inseted_data = $dao->insert("${3:intermediate_table_name}" , { ${4:parent_table_name}=> $1  , ${5:child_table_name}=> $2 });
+	}
 
 snippet wanon2.config_base
 	#use DBIx::QueryLog;

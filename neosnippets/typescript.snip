@@ -53,7 +53,7 @@ snippet sni.singleton
 		
 		public static getInstance() : $1{
 			if ($1._instance == null){
-	$1._instance = new $1();
+				$1._instance = new $1();
 			}
 
 			return $1._instance;
@@ -75,9 +75,16 @@ snippet react.component
 		constructor(props) {
 			super(props);
 		}
-	
+
+		componentWillMount() : void {
+		}
 		componentDidMount() : void {
-			//"マウント後"
+		}
+
+		componentWillUpdate() : void {
+		}
+	
+		componentDidUpdate() : void {
 		}
 	
 		componentWillUnmount() : void {
@@ -86,64 +93,25 @@ snippet react.component
 		render() {
 			return (
 				<div >
-				 //<button onClick={this.createView.bind(this)}>新規グループ</button>
 				</div>
 			);
 		}
 	}
 
-snippet react.store
-
-	module ${1} {
-		export module ${2} {
-			export class Store {
-				component : React.Component;
-				isFirstCall : boolean = false;
-				data : any;
-				constructor(){
-	
-				}
-	
-				private forceUpdate(){
-					if(this.component){
-						this.component.forceUpdate();
-					}
-				}
-	
-				public attachComponent(component){
-					if (!this.isFirstCall){
-						this.getInitialData();
-					}
-					this.component = component;
-				}
-
-				public removeComponent(){
-					this.component = null;
-				}
-
-				public updateData(data){
-					this.data = data;
-					this.forceUpdate();
-				}
-
-				private getInitialData(){
-					this.isFirstCall = true;
-					this.data = null;
-					this.forceUpdate();
-				}
-
-			}
-		}
-	
-	}
 
 snippet ref
 	/// <reference path="Component/Parent.react.ts" />
+
+snippet import
+	import React = require('${1}');
 
 snippet keys
 	for (var _id in hash){
 		//var row = hash[_id];
 	}
+
+snippet keys
+	keys = Object.keys({});
 
 snippet react.action
 	class ${1}Action{
@@ -174,8 +142,6 @@ snippet bind
 snippet call
 	//methodA.call(thisにしたいobject , [, arg1 [, arg2, ...]]);
 
-
-
 snippet sni.cssGlobal 
 	
 	var style = document.createElement("style");
@@ -187,10 +153,16 @@ snippet sni.cssGlobal
 
 	appendStyle("*::-webkit-media-controls-play-button", "width", '200px');
 
+snippet View
+	<View>${1}</View>
 
+snippet Text
+	<Text>${1}</Text>
 
-
-
-
-
+snippet Style
+	var styles = StyleSheet.create({
+		${1}: {
+			fontFamily: 'Cochin',
+		},
+	});
 
